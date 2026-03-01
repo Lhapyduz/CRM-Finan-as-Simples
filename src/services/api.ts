@@ -199,47 +199,60 @@ export type RecurringExpense = {
 
 export type RecurringExpenseFormData = Omit<RecurringExpense, 'id'>;
 
+// Helper: converte dados do Supabase (lowercase) para o formato do app (camelCase)
+const mapFromDb = (row: Record<string, unknown>): RecurringExpense => ({
+  id: row.id as number,
+  description: row.description as string,
+  amount: Number(row.amount),
+  category: row.category as string,
+  dueDate: (row.duedate as string) || '',
+  isPaid: (row.ispaid as boolean) || false,
+});
+
+// Helper: converte dados do app (camelCase) para o formato do Supabase (lowercase)
+const mapToDb = (expense: RecurringExpenseFormData) => ({
+  description: expense.description,
+  amount: expense.amount,
+  category: expense.category,
+  duedate: expense.dueDate,
+  ispaid: expense.isPaid ? true : false,
+});
+
 export const recurringExpenseService = {
   // Buscar todos os gastos recorrentes
   getAll: async (): Promise<RecurringExpense[]> => {
     const { data, error } = await supabase
       .from('recurring_expenses')
       .select('*')
-      .order('dueDate', { ascending: true });
+      .order('duedate', { ascending: true });
 
     if (error) throw error;
-    return data || [];
+    return (data || []).map(mapFromDb);
   },
 
   // Criar um novo gasto recorrente
   create: async (expense: RecurringExpenseFormData): Promise<RecurringExpense> => {
     const { data, error } = await supabase
       .from('recurring_expenses')
-      .insert([{
-        ...expense,
-        isPaid: expense.isPaid ? true : false
-      }])
+      .insert([mapToDb(expense)])
       .select()
       .single();
 
     if (error) throw error;
-    return data;
+    return mapFromDb(data);
   },
 
   // Atualizar um gasto recorrente existente
   update: async (id: number, expense: RecurringExpenseFormData): Promise<RecurringExpense> => {
     const { data, error } = await supabase
       .from('recurring_expenses')
-      .update({
-        ...expense,
-        isPaid: expense.isPaid ? true : false
-      })
+      .update(mapToDb(expense))
       .eq('id', id)
       .select()
       .single();
 
     if (error) throw error;
-    return data;
+    return mapFromDb(data);
   },
 
   // Excluir um gasto recorrente
