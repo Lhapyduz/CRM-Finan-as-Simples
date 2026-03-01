@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Switch } from '@headlessui/react';
-import { MoonIcon, SunIcon, BellIcon, UserCircleIcon, KeyIcon, CurrencyDollarIcon } from '@heroicons/react/24/outline';
+import { SunIcon, BellIcon, UserCircleIcon, KeyIcon, CurrencyDollarIcon } from '@heroicons/react/24/outline';
 
 export default function Settings() {
   // Estados para as configurações
@@ -8,7 +8,7 @@ export default function Settings() {
   const [notifications, setNotifications] = useState(true);
   const [currency, setCurrency] = useState('BRL');
   const [language, setLanguage] = useState('pt-BR');
-  
+
   // Função para alternar o modo escuro
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
@@ -23,7 +23,7 @@ export default function Settings() {
   return (
     <div className="animate-slide-in">
       <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Configurações</h1>
-      
+
       <div className="space-y-6">
         {/* Seção de Aparência */}
         <div className="card bg-white dark:bg-gray-800">
@@ -31,7 +31,7 @@ export default function Settings() {
             <SunIcon className="h-5 w-5 mr-2 text-primary-600" />
             Aparência
           </h2>
-          
+
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
@@ -51,14 +51,14 @@ export default function Settings() {
             </div>
           </div>
         </div>
-        
+
         {/* Seção de Notificações */}
         <div className="card bg-white dark:bg-gray-800">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
             <BellIcon className="h-5 w-5 mr-2 text-primary-600" />
             Notificações
           </h2>
-          
+
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
@@ -78,14 +78,14 @@ export default function Settings() {
             </div>
           </div>
         </div>
-        
+
         {/* Seção de Preferências */}
         <div className="card bg-white dark:bg-gray-800">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
             <CurrencyDollarIcon className="h-5 w-5 mr-2 text-primary-600" />
             Preferências
           </h2>
-          
+
           <div className="space-y-4">
             <div>
               <label htmlFor="currency" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -103,7 +103,7 @@ export default function Settings() {
                 <option value="GBP">Libra Esterlina (£)</option>
               </select>
             </div>
-            
+
             <div>
               <label htmlFor="language" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Idioma
@@ -122,14 +122,14 @@ export default function Settings() {
             </div>
           </div>
         </div>
-        
+
         {/* Seção de Conta */}
         <div className="card bg-white dark:bg-gray-800">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
             <UserCircleIcon className="h-5 w-5 mr-2 text-primary-600" />
             Conta
           </h2>
-          
+
           <div className="space-y-4">
             <div>
               <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-1">Perfil</h3>
@@ -137,7 +137,7 @@ export default function Settings() {
                 Editar Perfil
               </button>
             </div>
-            
+
             <div>
               <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-1">Senha</h3>
               <button className="btn btn-secondary w-full sm:w-auto flex items-center justify-center">
@@ -145,7 +145,7 @@ export default function Settings() {
                 Alterar Senha
               </button>
             </div>
-            
+
             <div className="pt-4 border-t dark:border-gray-700">
               <button className="px-4 py-2 text-sm font-medium text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">
                 Excluir Conta
@@ -153,16 +153,16 @@ export default function Settings() {
             </div>
           </div>
         </div>
-        
+
         {/* Seção de Exportação de Dados */}
         <div className="card bg-white dark:bg-gray-800">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Exportação de Dados</h2>
-          
+
           <div className="space-y-4">
             <p className="text-sm text-gray-500 dark:text-gray-400">
               Exporte seus dados financeiros para análise externa ou backup.
             </p>
-            
+
             <div className="flex flex-wrap gap-3">
               <button className="btn btn-secondary">
                 Exportar CSV

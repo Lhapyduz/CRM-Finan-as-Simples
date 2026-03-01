@@ -23,21 +23,21 @@ export default function Budgets() {
     try {
       const budgetsData = await budgetService.getAll();
       const transactions = await transactionService.getAll();
-      
+
       const budgetsWithSpending = budgetsData.map(budget => {
-        const relevantTransactions = transactions.filter(transaction => 
-          transaction.type === 'expense' && 
-          transaction.category === budget.category && 
+        const relevantTransactions = transactions.filter(transaction =>
+          transaction.type === 'expense' &&
+          transaction.category === budget.category &&
           transaction.date.startsWith(budget.period)
         );
-        
-        const spent = relevantTransactions.reduce((total, transaction) => 
+
+        const spent = relevantTransactions.reduce((total, transaction) =>
           total + transaction.amount, 0
         );
-        
+
         return { ...budget, spent };
       });
-      
+
       setBudgets(budgetsWithSpending);
     } catch (error) {
       console.error('Erro ao buscar orçamentos:', error);
@@ -71,9 +71,9 @@ export default function Budgets() {
     try {
       if (editingBudget) {
         const updatedBudget = await budgetService.update(editingBudget.id, data);
-        setBudgets(budgets.map(budget => 
-          budget.id === editingBudget.id 
-            ? { ...updatedBudget, spent: budget.spent } 
+        setBudgets(budgets.map(budget =>
+          budget.id === editingBudget.id
+            ? { ...updatedBudget, spent: budget.spent }
             : budget
         ));
         toast.success('Orçamento atualizado com sucesso!');
@@ -119,7 +119,7 @@ export default function Budgets() {
           Novo Orçamento
         </button>
       </div>
-      
+
       {isLoading ? (
         <div className="flex justify-center items-center h-64">
           <p className="text-gray-500 dark:text-gray-400">Carregando orçamentos...</p>
@@ -127,21 +127,21 @@ export default function Budgets() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {budgets.map((budget) => {
-            const percentage = calculatePercentage(budget.spent, budget.amount);
-            const isOverBudget = budget.spent > budget.amount;
-            
+            const percentage = calculatePercentage(budget.spent || 0, budget.amount);
+            const isOverBudget = (budget.spent || 0) > budget.amount;
+
             return (
               <div key={budget.id} className="card overflow-hidden">
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="font-semibold text-lg">{budget.category}</h3>
                   <div className="flex space-x-2">
-                    <button 
+                    <button
                       onClick={() => openEditModal(budget)}
                       className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
                     >
                       <PencilIcon className="h-5 w-5" />
                     </button>
-                    <button 
+                    <button
                       onClick={() => deleteBudget(budget.id)}
                       className="text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400"
                     >
@@ -149,22 +149,22 @@ export default function Budgets() {
                     </button>
                   </div>
                 </div>
-                
+
                 <div className="text-sm text-gray-500 dark:text-gray-400 mb-3">
                   Período: {budget.period}
                 </div>
-                
+
                 <div className="flex justify-between mb-1">
                   <span className="text-sm font-medium">
-                    R$ {budget.spent.toFixed(2)} / R$ {budget.amount.toFixed(2)}
+                    R$ {(budget.spent || 0).toFixed(2)} / R$ {budget.amount.toFixed(2)}
                   </span>
                   <span className={`text-sm font-medium ${isOverBudget ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
                     {percentage}%
                   </span>
                 </div>
-                
+
                 <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                  <div 
+                  <div
                     className={`h-2.5 rounded-full ${isOverBudget ? 'bg-red-600 dark:bg-red-500' : 'bg-primary-600 dark:bg-primary-500'}`}
                     style={{ width: `${percentage}%` }}
                   ></div>
@@ -233,7 +233,7 @@ export default function Budgets() {
                         id="amount"
                         step="0.01"
                         className="input-field"
-                        {...register('amount', { 
+                        {...register('amount', {
                           required: 'Valor é obrigatório',
                           min: { value: 0, message: 'Valor deve ser maior que zero' }
                         })}
