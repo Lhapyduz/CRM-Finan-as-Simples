@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { ArrowUpIcon, ArrowDownIcon, BanknotesIcon, WalletIcon } from '@heroicons/react/24/outline';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title } from 'chart.js';
 import { Doughnut, Bar } from 'react-chartjs-2';
-import { transactionService, Transaction } from '../services/api';
+import { transactionService, recurringExpenseService, Transaction, RecurringExpense } from '../services/api';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -12,21 +12,26 @@ ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarEle
 export default function Dashboard() {
   // Estado para armazenar as transações
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [recurringExpenses, setRecurringExpenses] = useState<RecurringExpense[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Buscar transações ao carregar o componente
   useEffect(() => {
-    fetchTransactions();
+    fetchData();
   }, []);
 
-  // Função para buscar transações da API
-  const fetchTransactions = async () => {
+  // Função para buscar transações e contas da API
+  const fetchData = async () => {
     setIsLoading(true);
     try {
-      const data = await transactionService.getAll();
-      setTransactions(data);
+      const [transactionsData, recurringData] = await Promise.all([
+        transactionService.getAll(),
+        recurringExpenseService.getAll()
+      ]);
+      setTransactions(transactionsData);
+      setRecurringExpenses(recurringData);
     } catch (error) {
-      console.error('Erro ao buscar transações:', error);
+      console.error('Erro ao buscar dados:', error);
       toast.error('Não foi possível carregar os dados do dashboard');
     } finally {
       setIsLoading(false);
@@ -43,6 +48,11 @@ export default function Dashboard() {
     .reduce((sum, transaction) => sum + transaction.amount, 0);
 
   const balance = totalIncome - totalExpense;
+
+  // Calcular Gastos Recorrentes Pendentes
+  const pendingRecurring = recurringExpenses
+    .filter(expense => !expense.isPaid)
+    .reduce((sum, expense) => sum + expense.amount, 0);
 
   // Dados para o gráfico de categorias de despesas
   const expenseCategories = transactions
@@ -126,7 +136,7 @@ export default function Dashboard() {
     <div className="animate-slide-in">
       <ToastContainer position="top-right" autoClose={3000} />
       <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Dashboard</h1>
-      
+
       {isLoading ? (
         <div className="flex justify-center items-center h-64">
           <p className="text-gray-500 dark:text-gray-400">Carregando dados do dashboard...</p>
@@ -144,7 +154,7 @@ export default function Dashboard() {
                 <p className="text-xl font-semibold text-gray-900 dark:text-white">R$ {totalIncome.toFixed(2)}</p>
               </div>
             </div>
-            
+
             <div className="card bg-white dark:bg-gray-800 flex items-center">
               <div className="rounded-full bg-red-100 dark:bg-red-900 p-3 mr-4">
                 <ArrowDownIcon className="h-6 w-6 text-red-600 dark:text-red-400" />
@@ -154,7 +164,7 @@ export default function Dashboard() {
                 <p className="text-xl font-semibold text-gray-900 dark:text-white">R$ {totalExpense.toFixed(2)}</p>
               </div>
             </div>
-            
+
             <div className="card bg-white dark:bg-gray-800 flex items-center">
               <div className="rounded-full bg-blue-100 dark:bg-blue-900 p-3 mr-4">
                 <WalletIcon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
@@ -166,7 +176,7 @@ export default function Dashboard() {
                 </p>
               </div>
             </div>
-            
+
             <div className="card bg-white dark:bg-gray-800 flex items-center">
               <div className="rounded-full bg-purple-100 dark:bg-purple-900 p-3 mr-4">
                 <ArrowUpIcon className="h-6 w-6 text-purple-600 dark:text-purple-400" />
@@ -178,8 +188,20 @@ export default function Dashboard() {
                 </p>
               </div>
             </div>
+
+            <div className="card bg-white dark:bg-gray-800 flex items-center">
+              <div className="rounded-full bg-orange-100 dark:bg-orange-900 p-3 mr-4">
+                <ArrowDownIcon className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">A Pagar (Agendado)</p>
+                <p className="text-xl font-semibold text-orange-600 dark:text-orange-400">
+                  R$ {pendingRecurring.toFixed(2)}
+                </p>
+              </div>
+            </div>
           </div>
-          
+
           {/* Gráficos */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             <div className="card bg-white dark:bg-gray-800">
@@ -188,7 +210,7 @@ export default function Dashboard() {
                 <Doughnut data={doughnutData} options={{ maintainAspectRatio: false }} />
               </div>
             </div>
-            
+
             <div className="card bg-white dark:bg-gray-800">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Receitas vs Despesas</h2>
               <div className="h-64">
@@ -196,7 +218,7 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
-          
+
           {/* Transações recentes */}
           <div className="card bg-white dark:bg-gray-800">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Transações Recentes</h2>

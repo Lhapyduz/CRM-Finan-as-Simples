@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { PlusIcon, PencilIcon, TrashIcon, CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
-import { recurringExpenseService, type RecurringExpense } from '../services/api';
+import { recurringExpenseService, transactionService, type RecurringExpense } from '../services/api';
 
 export default function RecurringExpenses() {
   const [expenses, setExpenses] = useState<RecurringExpense[]>([]);
@@ -39,7 +39,7 @@ export default function RecurringExpenses() {
     e.preventDefault();
     try {
       const { id, ...expenseData } = currentExpense;
-      
+
       // Validar e formatar os dados antes de enviar
       if (!expenseData.description.trim() || !expenseData.category.trim() || !expenseData.dueDate || expenseData.amount <= 0) {
         toast.error('Por favor, preencha todos os campos corretamente');
@@ -53,10 +53,10 @@ export default function RecurringExpenses() {
         amount: Number(expenseData.amount),
         isPaid: expenseData.isPaid === true ? true : false
       };
-      
+
       // Log para depuração
       console.log('Dados formatados:', formattedData);
-      
+
       if (isEditing) {
         await recurringExpenseService.update(id, formattedData);
         toast.success('Gasto atualizado com sucesso!');
@@ -64,7 +64,7 @@ export default function RecurringExpenses() {
         await recurringExpenseService.create(formattedData);
         toast.success('Gasto adicionado com sucesso!');
       }
-      
+
       await fetchExpenses();
       resetForm();
     } catch (error) {
@@ -75,7 +75,7 @@ export default function RecurringExpenses() {
 
   const handleDelete = async (id: number) => {
     if (!confirm('Tem certeza que deseja excluir este gasto recorrente?')) return;
-    
+
     try {
       await recurringExpenseService.delete(id);
       toast.success('Gasto excluído com sucesso!');
@@ -89,8 +89,28 @@ export default function RecurringExpenses() {
   const handleTogglePaid = async (expense: RecurringExpense) => {
     try {
       const { id, ...expenseData } = expense;
-      await recurringExpenseService.update(id, { ...expenseData, isPaid: !expense.isPaid });
-      toast.success(`Gasto marcado como ${!expense.isPaid ? 'pago' : 'não pago'}!`);
+      const newStatus = !expense.isPaid;
+
+      await recurringExpenseService.update(id, { ...expenseData, isPaid: newStatus });
+      toast.success(`Gasto marcado como ${newStatus ? 'pago' : 'não pago'}!`);
+
+      // Se foi marcado como pago, cria uma transação real
+      if (newStatus === true) {
+        try {
+          await transactionService.create({
+            description: expense.description,
+            amount: expense.amount,
+            type: 'expense',
+            category: expense.category,
+            date: new Date().toISOString().slice(0, 10)
+          });
+          toast.success('Transação adicionada ao histórico!');
+        } catch (txnError) {
+          console.error('Erro ao criar transação automática:', txnError);
+          toast.error('Gasto marcado como pago, mas falhou ao gerar transação no histórico.');
+        }
+      }
+
       await fetchExpenses();
     } catch (error) {
       console.error('Erro:', error);
@@ -142,12 +162,12 @@ export default function RecurringExpenses() {
                 <input
                   type="text"
                   value={currentExpense.description}
-                  onChange={(e) => setCurrentExpense({...currentExpense, description: e.target.value})}
+                  onChange={(e) => setCurrentExpense({ ...currentExpense, description: e.target.value })}
                   className="input-field"
                   required
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Categoria
@@ -155,7 +175,7 @@ export default function RecurringExpenses() {
                 <input
                   type="text"
                   value={currentExpense.category}
-                  onChange={(e) => setCurrentExpense({...currentExpense, category: e.target.value})}
+                  onChange={(e) => setCurrentExpense({ ...currentExpense, category: e.target.value })}
                   className="input-field"
                   required
                 />
@@ -168,7 +188,7 @@ export default function RecurringExpenses() {
                 <input
                   type="number"
                   value={currentExpense.amount}
-                  onChange={(e) => setCurrentExpense({...currentExpense, amount: parseFloat(e.target.value)})}
+                  onChange={(e) => setCurrentExpense({ ...currentExpense, amount: parseFloat(e.target.value) })}
                   className="input-field"
                   min="0"
                   step="0.01"
@@ -183,7 +203,7 @@ export default function RecurringExpenses() {
                 <input
                   type="date"
                   value={currentExpense.dueDate}
-                  onChange={(e) => setCurrentExpense({...currentExpense, dueDate: e.target.value})}
+                  onChange={(e) => setCurrentExpense({ ...currentExpense, dueDate: e.target.value })}
                   className="input-field"
                   required
                 />
