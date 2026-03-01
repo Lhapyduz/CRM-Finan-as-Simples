@@ -1,0 +1,60 @@
+{
+  "avatar": "https://avatars.githubusercontent.com/u/40735155?v=4",
+  "connected_accounts": {
+    "github": "Lhapyduz"
+  },
+  "created_at": "2024-11-05T14:51:05.950Z",
+  "email": "gregory.volpi@hotmail.com",
+  "favorite_sites": [],
+  "full_name": "Gregory Volpi",
+  "last_login": "2026-03-01T20:30:10.811Z",
+  "pending_email": null,
+  "questionnaire": {
+    "_id": null,
+    "company_size_c": "1-10",
+    "job_leadership_title": "",
+    "job_role": "designer",
+    "use_case": "saas_app",
+    "use_case_context": "work",
+    "use_case_something_else": ""
+  },
+  "saml_slug": null,
+  "site_count": 5,
+  "slug": "Lhapyduz",
+  "uid": null,
+  "account_id": "672a30d9000bd4be03798b13",
+  "tracking_id": "672a30d9000bd4be03798b11",
+  "mfa_enabled": false,
+  "id": "672a30d9000bd4be03798b11",
+  "login_providers": [
+    "github"
+  ],
+  "avatar_url": "https://avatars.githubusercontent.com/u/40735155?v=4",
+  "onboarding_progress": {
+    "guided_onboarding": {
+      "webapp": {
+        "deploy-again": "completed",
+        "view-deploy-preview": "open",
+        "add-custom-domain": "completed",
+        "connect-git-provider": "completed",
+        "view-database-card": "completed",
+        "view-auth-card": "open",
+        "__seen": true,
+        "__started": true
+      },
+      "last_task_name_completed": null,
+      "total_tasks": 6,
+      "total_tasks_completed": 4
+    },
+    "notifications_read_at": "2024-11-19T15:00:00.000Z",
+    "slides": "closed"
+  },
+  "sandbox": false,
+  "graphql_enabled": false,
+  "has_pending_email_verification": false,
+  "saml_account_id": "",
+  "saml_organization_id": "",
+  "preferred_account_id": "",
+  "command_bar_signed_user_id": "602da00128a5fc8f530892ba2f134349d662ddd959220580e7667b5efc2b5519",
+  "managed_by_sso_or_directory_sync": false
+}
